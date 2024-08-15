@@ -181,3 +181,6 @@ def main():
     # print(f"Test loss: {test_loss:.4f}, Test_acc: {test_acc:.4f}")
 
     # torch.save(model.state_dict(), last_path)
+
+if __name__ == '__main__':
+    main()
