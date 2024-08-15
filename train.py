@@ -46,11 +46,6 @@ parser.add_argument('--lr', type=float, default=1e-5)
 parser.add_argument('--save_ckpts', type=str, default='checkpoints')
 
 
-
-
-
-
-
 def train_epoch(model, train_loader, optimizer, criterion, miner, device):
     model.train()
     running_loss = 0.0
@@ -129,25 +124,27 @@ def main():
         transforms.ToTensor(),
         normalize,
     ])
+    try:
+        dataset = torchvision.datasets.ImageFolder(args.train_folder, transform=transform)
+        # val_dataset = torchvision.datasets.ImageFolder(args.val_folder, transform=transform)
+        train_size = int(0.9 * len(dataset))
+        valid_size = len(dataset) - train_size
+        train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, valid_size])
         
-    dataset = torchvision.datasets.ImageFolder(args.train_folder, transform=transform)
-    # val_dataset = torchvision.datasets.ImageFolder(args.val_folder, transform=transform)
-    train_size = int(0.9 * len(dataset))
-    valid_size = len(dataset) - train_size
-    train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, valid_size])
-    
-    print("Number of train samples: ", len(train_dataset))
-    print("Number of vaild samples: ", len(val_dataset))
-    print("Detected Classes TrainDS are: ", len(train_dataset.class_to_idx.keys()))
-    print("Detected Classes ValDS are: ", len(val_dataset.class_to_idx.keys()))
-    
-    miner = miners.MultiSimilarityMiner()
-    criterion = losses.TripletMarginLoss(margin=5.)
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,  num_workers=8)
-    valid_loader  = torch.utils.data.DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True, num_workers=8)
+        print("Number of train samples: ", len(train_dataset))
+        print("Number of vaild samples: ", len(val_dataset))
+        print("Detected Classes TrainDS are: ", len(dataset.class_to_idx.keys()))
+        # print("Detected Classes ValDS are: ", len(val_dataset.class_to_idx.keys()))
+        
+        miner = miners.MultiSimilarityMiner()
+        criterion = losses.TripletMarginLoss(margin=5.)
+        train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True,  num_workers=8)
+        valid_loader  = torch.utils.data.DataLoader(val_dataset, batch_size=args.batch_size, shuffle=True, num_workers=8)
 
-    print('Infor loader: ')
-    print('Train_loader: {0}, valid_loader: {1}'.format(len(train_loader), len(valid_loader)))
+        print('Infor loader: ')
+        print('Train_loader: {0}, valid_loader: {1}'.format(len(train_loader), len(valid_loader)))
+    except:
+        print('Missing data!!!')
     if args.optimizer == 'sgd':
         optimizer = torch.optim.SGD(net.parameters(), lr=args.lr)
     else:
