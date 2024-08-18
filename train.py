@@ -16,6 +16,7 @@ import cv2
 import pickle
 from tqdm import tqdm
 import argparse
+from datasets.imagefolder import ImageFolderDataset
 
 from pytorch_metric_learning.distances import CosineSimilarity
 from pytorch_metric_learning.reducers import ThresholdReducer
@@ -125,8 +126,8 @@ def main():
         normalize,
     ])
     try:
-        dataset = torchvision.datasets.ImageFolder(args.train_folder, transform=transform)
-        # val_dataset = torchvision.datasets.ImageFolder(args.val_folder, transform=transform)
+        dataset = ImageFolderDataset(args.train_folder, transform=transform)
+        # val_dataset = ImageFolderDatasetFolder(args.val_folder, transform=transform)
         train_size = int(0.9 * len(dataset))
         valid_size = len(dataset) - train_size
         train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, valid_size])
