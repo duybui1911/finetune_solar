@@ -16,7 +16,7 @@ import cv2
 import pickle
 from tqdm import tqdm
 import argparse
-from datasets.imagefolder import ImageFolderDataset
+from .datasets.imagefolder import ImageFolderDataset
 
 from pytorch_metric_learning.distances import CosineSimilarity
 from pytorch_metric_learning.reducers import ThresholdReducer
